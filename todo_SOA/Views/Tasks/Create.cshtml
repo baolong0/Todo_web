@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>new tasks</title>
+    <link rel="stylesheet" href="~/css/newtask.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="header">
+        <div class="left">
+            <!-- <a href=""><div class="fa fa-bars"></div></a> -->
+            <a href="todolist.html"><div class="fa fa-home"></div></a>
+            <!-- <a href=""><div class="fa fa-search"></div></a> -->
+        </div>
+        <div class="right">
+            <a href="due.html"><div class="fa fa-bell"></div></a>
+            <a href=""><div class="fa fa-user"></div></a>
+        </div>
+    </div>
+    <div class="bodys">
+        <div class="left-menu">
+            <a href="newtask.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">New Tasks</div>
+                </div>
+            </a>
+            <!-- 1line -->
+            <a href="list.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">List Tasks</div>
+                </div>
+            </a>
+            <!-- 1line -->
+            <a href="due.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">Due time</div>
+                </div>
+            </a>
+            <!-- 1line -->
+        </div>
+
+        <div class="right-menu">
+            <form action="/action_page.php">
+                <label for="Tname">Task name:</label> <br>
+                <input type="text" id="Tname" name="Tname" style="width:50%; height:30px;"><br><br>
+
+                <label for="Tname">Task tags:</label> <br>
+                <input type="text" id="Tags" name="Tags" style="width:50%; height: 30px;"><br><br>
+                <label for="birthday">Task due time:</label><br>
+                <input type="date" id="birthday" name="birthday" style="width:50%; height: 30px;"><br><br>
+                <label for="lname">Task description:</label> <br>
+                <input type="text" id="description" name="description" style="width:50%; height: 30px ;"><br><br>
+                <input type="submit" value="Save Task" style="font-size: 20px ; width: 150px; height: 30px; border-radius: 20px; background-color: chocolate;  ">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

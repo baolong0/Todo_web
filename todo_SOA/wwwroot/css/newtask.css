@@ -1,0 +1,63 @@
+*{margin: 0; padding: 0;}
+.header{
+    width: 100%;
+    height: 40px;
+    background-color: chocolate;
+    font-size: 25px;
+    padding-top: 10px;
+    padding-left: 20px;
+    text-align: left;
+    display: flex;
+    
+}
+ a{
+    color: black;
+    transition: 0.3s;
+    text-decoration: none;
+}
+ a:hover{
+    color: white;
+}
+.header .left {
+    width: 50%;
+}
+.header .left .fa-home{
+    padding: 0px 20px;
+}
+.header .right{
+    width: 50%;
+    text-align: right;
+    padding-right: 40px;
+}
+.header .right .fa-user{
+    padding-left:20px;
+}
+
+/* hết phần header */
+
+.bodys{
+    display: flex;
+    height: 540px;
+    text-decoration: none;
+}
+.bodys .left-menu{
+    width: 20%;
+    background-color: rgb(238, 230, 217);
+    padding: 10px 0px 20px 10px;
+}
+.bodys .left-menu .left{
+   display: flex;
+   font-size: 20px;
+   color: black;
+}
+/* .bodys a{text-decoration: none;} */
+.bodys .left-menu .left .icon{width: 13%; padding: 10px;}
+.bodys .left-menu .left .name{width: 87%; padding: 10px;}
+
+.bodys .right-menu{
+    width: 80%;
+    background-color: rgb(234, 234, 240);
+    height: 500px;
+    padding: 20px 0px 20px 100px;
+    font-size: 25px;
+}

@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Todolist</title>
+    <link rel="stylesheet" href="todolist.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="left">
+            <!-- <a href="todolist.html"><div class="fa fa-bars"></div></a> -->
+            <a href="todolist.html"><div class="fa fa-home"></div></a>
+            <!-- <a href=""><div class="fa fa-search"></div></a> -->
+        </div>
+        <div class="right">
+            <a href=""><div class="fa fa-bell"></div></a>
+            <a href=""><div class="fa fa-user"></div></a>
+        </div>
+    </div>
+    <div class="bodys">
+        <div class="left-menu">
+            <a href="newtask.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">New Tasks</div>
+                </div>
+            </a>
+            <!-- 1line -->
+            <a href="list.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">List Tasks</div>
+                </div>
+            </a>
+            <!-- 1line -->
+            <a href="due.html">
+                <div class="left">
+                    <div class="icon"><div class="fa fa-tasks"></div></div>
+                    <div class="name">Due time</div>
+                </div>
+            </a>
+            <!-- 1line -->
+        </div>
+    </div>
+    <div class="container">
+        <h2>Helloo,@ViewBag.UserName</h2>
+        <p>List of task you must to do</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>status</th>
+                    <th>tag</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.DataSource)
+                {
+                    <tr class="success">
+                        <td>@item.Name</td>
+                        <td>@item.Status</td>
+                        <td>@item.DueTime</td>
+                    </tr>
+
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
+
+
+
+
+

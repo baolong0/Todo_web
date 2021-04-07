@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="~/css/Login.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="wrapper">
+        <h1>@ViewBag.Status</h1>
+        <h4>@ViewBag.Message</h4>
+        <h2>@TempData["userID"]</h2>
+        @Html.ActionLink("Try Again!",
+            "Index",
+            "Users"
+        )
+    </div>
+</body>
+</html>
+
+
