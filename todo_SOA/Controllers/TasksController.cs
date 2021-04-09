@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,13 @@ namespace todo_SOA.Controllers
         public async Task<ActionResult> IndexAsync()
         {
 
-            userID = Convert.ToString(TempData["UserID"]);
+
+            this.userID = Convert.ToString(TempData["UserID"]);
             ViewBag.UserName = TempData["UserName"];
             TempData.Keep();
+            ViewBag.UserID = TempData["UserID"];
+            TempData.Keep();
+            ViewBag.Login = (userID == "") ? false : true;
             string url = serverEndPoin + "/tasks";
 
             // Khởi tạo http client
@@ -40,7 +45,7 @@ namespace todo_SOA.Controllers
                 temp.Id = item["id"];
                 temp.Name = item["name"];
                 temp.DueTime = item["dueTime"];
-                temp.Status = item["status"]; 
+                temp.Status = item["status"];
                 temp.Tag = item["tagsList"][0]["name"];
                 listTask.Add(temp);
             }
@@ -78,11 +83,11 @@ namespace todo_SOA.Controllers
             return View();
         }
 
-        // GET: Tasks/Details/5
-        public ActionResult List()
+
+        public ActionResult Error(dynamic ViewBag)
         {
 
-            return View();
+            return View(ViewBag);
         }
 
         // GET: Tasks/Create
@@ -94,63 +99,279 @@ namespace todo_SOA.Controllers
         // POST: Tasks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(IFormCollection collection)
+        {
+            ViewBag.Login = (userID == "") ? false : true;
+
+            try
+            {
+                this.userID = Convert.ToString(TempData["UserID"]);
+                ViewBag.UserName = TempData["UserName"];
+                TempData.Keep();
+                var httpClient = new HttpClient();
+
+                string url = serverEndPoin + "/tasks";
+                string name = collection["name"];
+                string description = collection["description"];
+                string dueTime = DateTime.Parse(collection["duetime"]).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.sssZ");
+                string tag = collection["tags"];
+                // Khởi tạo http client
+                var httpRequestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(url)
+                };
+                // Tạo StringContent
+                string jsoncontent = "{\"taskName\": \"" + name + "\", \"description\": \"" + description + "\", \"dueTime\": \"" + dueTime + "\", \"tags\": [\"" + tag + "\"]}";
+                var httpContent = new StringContent(jsoncontent, Encoding.UTF8, "application/json");
+                httpRequestMessage.Content = httpContent;
+                httpClient.DefaultRequestHeaders.Add("Authorization", userID);
+                // call api
+                var response = await httpClient.SendAsync(httpRequestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var status = response.StatusCode;
+                ViewBag.Message = responseContent;
+                // Chuyển sang object 
+                JavaScriptSerializer j = new JavaScriptSerializer();
+                var obj = j.Deserialize<dynamic>(responseContent);
+
+
+                switch (status)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        ViewBag.Message = "Created";
+                        break;
+                    case System.Net.HttpStatusCode.Unauthorized:
+                        break;
+                    case System.Net.HttpStatusCode.Created:
+                        ViewBag.Message = "New Task Created";
+                        break;
+                    case System.Net.HttpStatusCode.BadRequest:
+                        string Res = "";
+                        if (obj["reasons"] != null)
+                        {
+                            foreach (var item in obj["reasons"])
+                            {
+                                Res = Res + "\n" + item["path"] + " : " + item["message"];
+                            }
+                        }
+                        ViewBag.Message = obj["message"] + "\n" + Res;
+                        break;
+                    case System.Net.HttpStatusCode.RequestTimeout:
+                        ViewBag.Message = "RequestTimeout";
+                        break;
+                    case System.Net.HttpStatusCode.InternalServerError:
+                        ViewBag.Message = "InternalServerError";
+                        break;
+                    default:
+                        ViewBag.Message = obj["message"];
+                        break;
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception e)
+            {
+                ViewBag.Message = e.Message.ToString();
+                ViewBag.Status = "sign in failed !!!";
+
+                return Redirect(Error(ViewBag));
+            }
+        }
+
+        public async Task<ActionResult> DetailAsync(string id)
         {
             try
             {
-                // TODO: Add insert logic here
+                this.userID = Convert.ToString(TempData["UserID"]);
+                ViewBag.UserName = TempData["UserName"];
+                TempData.Keep();
+                ViewBag.UserID = TempData["UserID"];
+                TempData.Keep();
+                ViewBag.Login = (userID == "") ? false : true;
+                string url = serverEndPoin + "/tasks/" + id;
 
-                return RedirectToAction(nameof(IndexAsync));
-            }
-            catch
-            {
+                // Khởi tạo http client
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", userID);
+                // Get data
+                var response = await httpClient.GetAsync(url);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var status = response.StatusCode;
+                // Chuyển sang object 
+                JavaScriptSerializer j = new JavaScriptSerializer();
+                var obj = j.Deserialize<dynamic>(responseContent);
+
+                switch (status)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        ViewBag.Status = "Get list Successfull";
+                        ViewBag.UserId = userID;
+                        Models.Task result = new Models.Task(obj["data"]["id"], obj["data"]["name"], obj["data"]["description"], obj["data"]["dueTime"], obj["data"]["status"], obj["data"]["tagsList"][0]["name"]);
+                        return View(result);
+                    case System.Net.HttpStatusCode.BadRequest:
+                        ViewBag.Status = "Get list UNSuccessfull";
+                        string Res = "";
+                        if (obj["reasons"] != null)
+                        {
+                            foreach (var item in obj["reasons"])
+                            {
+                                Res = Res + "\n" + item["path"] + " : " + item["message"];
+                            }
+                        }
+                        ViewBag.Message = obj["message"] + "\n" + Res;
+                        break;
+                    case System.Net.HttpStatusCode.RequestTimeout:
+                        ViewBag.Status = "Get list UNSuccessfull";
+                        ViewBag.Message = "RequestTimeout";
+                        break;
+                    case System.Net.HttpStatusCode.InternalServerError:
+                        ViewBag.Status = "Get list UNSuccessfull";
+                        ViewBag.Message = "InternalServerError";
+                        break;
+                    default:
+                        ViewBag.Message = obj["message"];
+                        break;
+                }
                 return View();
             }
-        }
-
-        // GET: Tasks/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Tasks/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            catch (Exception e)
             {
-                // TODO: Add update logic here
+                ViewBag.Message = e.Message.ToString();
+                ViewBag.Status = "sign in failed !!!";
 
-                return RedirectToAction(nameof(IndexAsync));
+                return Error(e);
             }
-            catch
-            {
-                return View();
-            }
+
         }
-
         // GET: Tasks/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync()
         {
+
+            this.userID = Convert.ToString(TempData["UserID"]);
+            ViewBag.UserName = TempData["UserName"];
+            TempData.Keep();
+            ViewBag.UserID = TempData["UserID"];
+            TempData.Keep();
+            ViewBag.Login = (userID == "") ? false : true;
+            string url = serverEndPoin + "/tasks";
+
+            // Khởi tạo http client
+            HttpClient httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Authorization", userID);
+            // Get data
+            var response = await httpClient.GetAsync(url);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var status = response.StatusCode;
+
+            // Chuyển sang object 
+            JavaScriptSerializer j = new JavaScriptSerializer();
+            var obj = j.Deserialize<dynamic>(responseContent);
+            List<TaskDT> listTask = new List<TaskDT>();
+            foreach (var item in obj["data"])
+            {
+                TaskDT temp = new TaskDT();
+                temp.Id = item["id"];
+                temp.Name = item["name"];
+                temp.DueTime = item["dueTime"];
+                temp.Status = item["status"];
+                temp.Tag = item["tagsList"][0]["name"];
+                listTask.Add(temp);
+            }
+            ViewBag.DataSource = listTask;
+            switch (status)
+            {
+                case System.Net.HttpStatusCode.OK:
+                    ViewBag.Status = "Get list Successfull";
+                    ViewBag.UserId = userID;
+                    break;
+                case System.Net.HttpStatusCode.BadRequest:
+                    ViewBag.Status = "Get list UNSuccessfull";
+                    string Res = "";
+                    if (obj["reasons"] != null)
+                    {
+                        foreach (var item in obj["reasons"])
+                        {
+                            Res = Res + "\n" + item["path"] + " : " + item["message"];
+                        }
+                    }
+                    ViewBag.Message = obj["message"] + "\n" + Res;
+                    break;
+                case System.Net.HttpStatusCode.RequestTimeout:
+                    ViewBag.Status = "Get list UNSuccessfull";
+                    ViewBag.Message = "RequestTimeout";
+                    break;
+                case System.Net.HttpStatusCode.InternalServerError:
+                    ViewBag.Status = "Get list UNSuccessfull";
+                    ViewBag.Message = "InternalServerError";
+                    break;
+                default:
+                    ViewBag.Message = obj["message"];
+                    break;
+            }
             return View();
         }
-
-        // POST: Tasks/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteItemAsync(string id)
         {
             try
             {
-                // TODO: Add delete logic here
+                this.userID = Convert.ToString(TempData["UserID"]);
+                ViewBag.UserName = TempData["UserName"];
+                TempData.Keep();
+                ViewBag.UserID = TempData["UserID"];
+                TempData.Keep();
+                ViewBag.Login = (userID == "") ? false : true;
+                string url = serverEndPoin + "/tasks/" + id;
 
-                return RedirectToAction(nameof(IndexAsync));
+                // Khởi tạo http client
+                HttpClient httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("Authorization", userID);
+                // Get data
+                var response = await httpClient.DeleteAsync(url);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var status = response.StatusCode;
+                // Chuyển sang object 
+                JavaScriptSerializer j = new JavaScriptSerializer();
+                var obj = j.Deserialize<dynamic>(responseContent);
+
+                switch (status)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        ViewBag.Status = "Delete Successfull";
+                        ViewBag.UserId = userID;
+                        return RedirectToAction("Delete", "Tasks");
+                    case System.Net.HttpStatusCode.BadRequest:
+                        ViewBag.Status = "Delete UNSuccessfull";
+                        string Res = "";
+                        if (obj["reasons"] != null)
+                        {
+                            foreach (var item in obj["reasons"])
+                            {
+                                Res = Res + "\n" + item["path"] + " : " + item["message"];
+                            }
+                        }
+                        ViewBag.Message = obj["message"] + "\n" + Res;
+                        break;
+                    case System.Net.HttpStatusCode.RequestTimeout:
+                        ViewBag.Status = "Delete UNSuccessfull";
+                        ViewBag.Message = "RequestTimeout";
+                        break;
+                    case System.Net.HttpStatusCode.InternalServerError:
+                        ViewBag.Status = "Delete UNSuccessfull";
+                        ViewBag.Message = "InternalServerError";
+                        break;
+                    default:
+                        ViewBag.Message = obj["message"];
+                        break;
+                }
+                return RedirectToAction("Delete", "Tasks");
             }
-            catch
+            catch (Exception e)
             {
-                return View();
+                ViewBag.Message = e.Message.ToString();
+                ViewBag.Status = "sign in failed !!!";
+
+                return RedirectToAction("Delete", "Tasks");
             }
         }
     }

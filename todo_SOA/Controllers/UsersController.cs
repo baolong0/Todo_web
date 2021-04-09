@@ -18,6 +18,7 @@ namespace todo_SOA.Controllers
         // GET: Users
         public ActionResult Index()
         {
+            ViewBag.Login = (userID == "") ? false : true;
             return View();
         }
         // POST: Users/Create
@@ -41,6 +42,7 @@ namespace todo_SOA.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(IFormCollection collection)
         {
+            ViewBag.Login = false;
             string email = collection["email"];
             string password = collection["password"];
             try

@@ -1,83 +1,80 @@
 ﻿@{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Bootstrap Example</title>
+    <title>My task</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Todolist</title>
     <link rel="stylesheet" href="todolist.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="header">
-        <div class="left">
-            <!-- <a href="todolist.html"><div class="fa fa-bars"></div></a> -->
-            <a href="todolist.html"><div class="fa fa-home"></div></a>
-            <!-- <a href=""><div class="fa fa-search"></div></a> -->
-        </div>
-        <div class="right">
-            <a href=""><div class="fa fa-bell"></div></a>
-            <a href=""><div class="fa fa-user"></div></a>
-        </div>
-    </div>
-    <div class="bodys">
-        <div class="left-menu">
-            <a href="newtask.html">
-                <div class="left">
-                    <div class="icon"><div class="fa fa-tasks"></div></div>
-                    <div class="name">New Tasks</div>
-                </div>
-            </a>
-            <!-- 1line -->
-            <a href="list.html">
-                <div class="left">
-                    <div class="icon"><div class="fa fa-tasks"></div></div>
-                    <div class="name">List Tasks</div>
-                </div>
-            </a>
-            <!-- 1line -->
-            <a href="due.html">
-                <div class="left">
-                    <div class="icon"><div class="fa fa-tasks"></div></div>
-                    <div class="name">Due time</div>
-                </div>
-            </a>
-            <!-- 1line -->
-        </div>
-    </div>
     <div class="container">
         <h2>Helloo,@ViewBag.UserName</h2>
-        <p>List of task you must to do</p>
-        <table class="table">
-            <thead>
+        <p> Here is list of task you must todo !</p>
+        <input type="button" class="btn btn-success" id="btn-create" style="margin-right:8px;border-radius: 0.5rem;margin-bottom:10px" value="Create new" />
+        <input type="button" class="btn btn-danger" id="btn-delete" style="margin-right:8px;border-radius: 0.5rem;margin-bottom:10px" value="Delete Mode" />
+        <p style=" text-align:center">
+            Click on a task to <b style=" color:green">view more !</b>
+        </p>
+        @if (ViewBag.Message != null)
+        {
+            <sub>@ViewBag.Message</sub>
+        }
+        <table class="table  table-hover">
+            <thead class="thead-dark">
                 <tr>
+                    <th class="d-none">ID</th>
                     <th>Name</th>
-                    <th>status</th>
-                    <th>tag</th>
+                    <th>Status</th>
+                    <th>Tags</th>
+                    <th>DueTime</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in ViewBag.DataSource)
                 {
-                    <tr class="success">
+                    <tr>
+                        <td class="d-none" id="ID-Task">@item.Id</td>
                         <td>@item.Name</td>
                         <td>@item.Status</td>
-                        <td>@item.DueTime</td>
+                        <td>@item.Tag</td>
+                        <td>@DateTime.Parse(item.DueTime)</td>
                     </tr>
-
                 }
 
             </tbody>
         </table>
     </div>
-
+    <script type="text/javascript">
+    $('#btn-create').click(function () {
+        document.location = '@Url.Action("Create","Tasks")';
+    });
+    </script>
+    <script type="text/javascript">
+    $('#btn-delete').click(function () {
+        document.location = '@Url.Action("Delete","Tasks")';
+    });
+    </script>
+    <script>
+    $(document).ready(function(){
+        $('table tr').click(function () {
+            var id = $(this).find('td:eq(0)').html();
+            Send(id);
+  });
+    });
+    function Send(id) {
+    var url = '@Url.Action("Detail", "Tasks", new { id = "__id__" })';
+    window.location.href = url.replace('__id__', id);
+}
+    </script>
 </body>
 </html>
 
