@@ -17,8 +17,7 @@ namespace todo_SOA.Controllers
         // GET: Tasks
         public async Task<ActionResult> IndexAsync()
         {
-
-
+            // Lưu trữ thông tin tạm của chương trình
             this.userID = Convert.ToString(TempData["UserID"]);
             ViewBag.UserName = TempData["UserName"];
             TempData.Keep();
@@ -173,7 +172,7 @@ namespace todo_SOA.Controllers
             catch (Exception e)
             {
                 ViewBag.Message = e.Message.ToString();
-                ViewBag.Status = "sign in failed !!!";
+                ViewBag.Status = "Can't Create Task !!!";
 
                 return Redirect(Error(ViewBag));
             }
@@ -183,6 +182,7 @@ namespace todo_SOA.Controllers
         {
             try
             {
+                // lưu trữ và truy xuất thông tin biến tạm tại Client
                 this.userID = Convert.ToString(TempData["UserID"]);
                 ViewBag.UserName = TempData["UserName"];
                 TempData.Keep();
@@ -315,6 +315,7 @@ namespace todo_SOA.Controllers
         {
             try
             {
+                // lưu thông tin tạm của chương trình 
                 this.userID = Convert.ToString(TempData["UserID"]);
                 ViewBag.UserName = TempData["UserName"];
                 TempData.Keep();

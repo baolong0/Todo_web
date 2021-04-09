@@ -110,7 +110,6 @@ namespace todo_SOA.Controllers
             {
                 ViewBag.Message = e.Message.ToString();
                 ViewBag.Status = "sign in failed !!!";
-
                 return View();
             }
         }
