@@ -49,18 +49,18 @@
                             Not a member? <a href="">Signup now</a>
                         </div>
                     </form>
-                <form action="#" class="signup">
+                <form asp-action="Create" asp-controller="Users" class="signup">
                     <div class="field">
-                        <input type="text" placeholder="First Name" required>
+                        <input type="text" name="firstName" placeholder="First Name" required>
                     </div>
                     <div class="field">
-                        <input type="text" placeholder="Last Name" required>
+                        <input type="text" name="lastName" placeholder="Last Name" required>
                     </div>
                     <div class="field">
-                        <input type="text" placeholder="Email Address" required>
+                        <input type="text" name="email" placeholder="Email Address" required>
                     </div>
                     <div class="field">
-                        <input type="password" placeholder="Password" required>
+                        <input type="password" name="password" placeholder="Password" required>
                     </div>
                     <div class="field">
                         <input type="password" placeholder="Confirm password" required>

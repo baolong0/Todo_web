@@ -24,16 +24,76 @@ namespace todo_SOA.Controllers
         // POST: Users/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(IFormCollection collection)
         {
+            ViewBag.Login = false;
+            string email = collection["email"];
+            string password = collection["password"];
+            string firstName = collection["firstName"];
+            string lastName = collection["lastName"];
             try
             {
-                // TODO: Add insert logic here
+                var httpClient = new HttpClient();
 
-                return RedirectToAction(nameof(Index));
+                string url = serverEndPoin + "/users";
+                // Khởi tạo http client
+                var httpRequestMessage = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri(url)
+                };
+                // Tạo StringContent
+                string jsoncontent = "{\"email\": \"" + email + "\", \"password\": \"" + password + "\",\"firstName\": \"" + firstName + "\",\"lastName\": \"" + lastName + "\"}";
+                var httpContent = new StringContent(jsoncontent, Encoding.UTF8, "application/json");
+                httpRequestMessage.Content = httpContent;
+                // call api
+                var response = await httpClient.SendAsync(httpRequestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var status = response.StatusCode;
+
+                // Chuyển sang object 
+                JavaScriptSerializer j = new JavaScriptSerializer();
+                var obj = j.Deserialize<dynamic>(responseContent);
+
+
+                switch (status)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        ViewBag.Status = "Create sucessfull";
+                        return RedirectToAction("index", "Tasks");
+                    case System.Net.HttpStatusCode.BadRequest:
+                        ViewBag.Status = "Create failed !!!";
+                        string Res = "";
+                        if (obj["reasons"] != null)
+                        {
+                            foreach (var item in obj["reasons"])
+                            {
+                                Res = Res + "\n" + item["path"] + " : " + item["message"];
+                            }
+                        }
+                        ViewBag.Message = obj["message"] + "\n" + Res;
+                        break;
+                    case System.Net.HttpStatusCode.RequestTimeout:
+                        ViewBag.Status = "Create failed !!!";
+                        ViewBag.Message = "RequestTimeout";
+                        break;
+                    case System.Net.HttpStatusCode.InternalServerError:
+                        ViewBag.Status = "Create failed !!!";
+                        ViewBag.Message = "InternalServerError";
+                        break;
+                    case System.Net.HttpStatusCode.Created:
+                        ViewBag.Status = "Create sucessfull";
+                        return View();
+                    default:
+                        ViewBag.Message = obj["message"];
+                        break;
+                }
+                return View();
             }
-            catch
+            catch (Exception e)
             {
+                ViewBag.Message = e.Message.ToString();
+                ViewBag.Status = "Create failed !!!";
                 return View();
             }
         }

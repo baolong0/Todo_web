@@ -180,6 +180,7 @@ namespace todo_SOA.Controllers
 
         public async Task<ActionResult> DetailAsync(string id)
         {
+            ViewBag.Login = (userID == "") ? false : true;
             try
             {
                 // lưu trữ và truy xuất thông tin biến tạm tại Client
@@ -247,7 +248,7 @@ namespace todo_SOA.Controllers
         // GET: Tasks/Delete/5
         public async Task<ActionResult> DeleteAsync()
         {
-
+            ViewBag.Login = (userID == "") ? false : true;
             this.userID = Convert.ToString(TempData["UserID"]);
             ViewBag.UserName = TempData["UserName"];
             TempData.Keep();
@@ -313,6 +314,7 @@ namespace todo_SOA.Controllers
         }
         public async Task<ActionResult> DeleteItemAsync(string id)
         {
+            ViewBag.Login = (userID == "") ? false : true;
             try
             {
                 // lưu thông tin tạm của chương trình 
