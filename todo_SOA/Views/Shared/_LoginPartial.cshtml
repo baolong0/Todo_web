@@ -13,10 +13,10 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
+            <a class="nav-link text-dark" id="register" asp-action="index" asp-controller="Users">Register</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+            <a class="nav-link text-dark" id="login" asp-action="index" asp-controller="Users">Login Now</a>
         </li>
     }
 </ul>
